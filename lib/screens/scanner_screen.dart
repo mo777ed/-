@@ -62,10 +62,16 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   String _errorMessage(MobileScannerException error) {
-    if (error.errorCode == MobileScannerErrorCode.permissionDenied) {
-      return 'لم يتم السماح للتطبيق باستخدام الكاميرا. فعّل صلاحية الكاميرا من إعدادات الجهاز، أو أدخل الباركود يدويًا.';
-    }
-    return 'تعذّر تشغيل الكاميرا على هذا الجهاز. يمكنك إدخال الباركود يدويًا.';
+    String detail = error.errorCode.name;
+    try {
+      final message = (error as dynamic).errorDetails?.message;
+      if (message != null) detail = '$detail: $message';
+    } catch (_) {}
+
+    final base = error.errorCode == MobileScannerErrorCode.permissionDenied
+        ? 'لم يتم السماح للتطبيق باستخدام الكاميرا. فعّل صلاحية الكاميرا من إعدادات الجهاز، أو أدخل الباركود يدويًا.'
+        : 'تعذّر تشغيل الكاميرا على هذا الجهاز. تأكد من صلاحية الكاميرا في إعدادات التطبيق، أو أدخل الباركود يدويًا.';
+    return '$base\n\n($detail)';
   }
 
   @override
